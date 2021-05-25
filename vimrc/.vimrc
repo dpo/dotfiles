@@ -18,6 +18,7 @@ Plug 'tmux-plugins/vim-tmux'
 " Plug 'neoclide/coc.nvim', {'tag': '*', 'branch': 'release'}
 
 Plug 'JuliaEditorSupport/julia-vim'
+Plug 'kdheepak/JuliaFormatter.vim'
 Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh'}
 " Plug 'roxma/nvim-completion-manager'  " optional
 
