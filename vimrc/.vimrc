@@ -38,6 +38,7 @@ Plug 'honza/vim-snippets'  " actual snippets
 " Plug 'dense-analysis/ale'  " syntax checking / linting
 
 Plug 'sonph/onehalf', {'rtp': 'vim/'}
+Plug 'cocopon/iceberg.vim'
 
 " Initialize plugin system
 call plug#end()

@@ -3,17 +3,17 @@
 function! SetBackgroundMode(...)
   let s:isdarkmode = trim(system("isdarkmode2"))
   if s:isdarkmode ==? "true"
-    colorscheme onehalfdark
+    colorscheme iceberg  "onehalfdark
     let &background = "dark"
   else
-    colorscheme onehalflight
+    colorscheme iceberg  "onehalflight
     let &background = "light"
   endif
 endfunction
 
 " check every half hour
 call SetBackgroundMode()
-call timer_start(1800000, "SetBackgroundMode", {"repeat": -1})
+call timer_start(900000, "SetBackgroundMode", {"repeat": -1})
 
 " enable true colors so Vim colors match Terminal colors
 " see https://github.com/sonph/onehalf/tree/master/vim#true-colors
