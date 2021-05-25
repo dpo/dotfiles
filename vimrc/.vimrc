@@ -2,9 +2,11 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-tbone'
 
 Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rhubarb'
 Plug 'airblade/vim-gitgutter'
 
 Plug 'luochen1990/rainbow'
@@ -14,29 +16,20 @@ Plug 'junegunn/fzf.vim'
 
 Plug 'tmux-plugins/vim-tmux'
 
-" Conquer of Completion
-" Plug 'neoclide/coc.nvim', {'tag': '*', 'branch': 'release'}
-
 Plug 'JuliaEditorSupport/julia-vim'
 Plug 'kdheepak/JuliaFormatter.vim'
 Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh'}
-" Plug 'roxma/nvim-completion-manager'  " optional
+" Plug 'roxma/nvim-completion-manager'
 
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 Plug 'vim-pandoc/vim-pandoc'
 " Plug 'vim-pandoc/vim-pandoc-syntax'
 Plug 'lervag/vimtex'
 
-" Autocompletion with Deoplete
-" Plug 'Shougo/deoplete.nvim'
-" Plug 'roxma/nvim-yarp'
-" Plug 'roxma/vim-hug-neovim-rpc'
-
 Plug 'SirVer/ultisnips'      " snippets engine
 Plug 'honza/vim-snippets'  " actual snippets
 
-" let g:ale_completion_enabled = 1 " must be set before ALE is loaded
-" Plug 'dense-analysis/ale'  " syntax checking / linting
+" Plug 'lifepillar/vim-mucomplete'  " autocompletion
 
 Plug 'sonph/onehalf', {'rtp': 'vim/'}
 Plug 'cocopon/iceberg.vim'
@@ -57,10 +50,17 @@ autocmd BufEnter * silent! lcd %:p:h  " automatically change to current file's d
 
 set cmdheight=2      " Get rid of pesky 'Press ENTER or type command to continue'
 
-" map <Up> g<Up>
-" map <Down> g<Down>
-" imap <Up> <C-[> <Up> i
-" imap <Down> <C-[> <Down> i
+" GitGutter configuration
+set updatetime=100   " update time for gitgutter symbols in ms
+function! GitStatus()
+  let [a,m,r] = GitGutterGetHunkSummary()
+  return printf('+%d ~%d -%d', a, m, r)
+endfunction
+set statusline+=%{GitStatus()}
+
+" indent blocks visually with persistent selection
+vnoremap > >gv
+vnoremap < <gv
 
 " jump to the last position when reopening a file
 if has("autocmd")
@@ -72,8 +72,11 @@ endif
 :au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 :au InsertLeave * match ExtraWhitespace /\s\+$/
 
-" highlight the current line
-" :hi CursorLine cterm=bold
+" automatically remove trailing whitespace when saving
+autocmd BufWritePre * %s/\s\+$//e
+
+" highlight cursor line
+" see colorscheme.vim for details
 :set cursorline
 
 " Rainbow parens
@@ -88,14 +91,6 @@ let g:rainbow_conf = {
 \ },
 \}
 
-" Deoplete configuration
-" set pyxversion=3
-" let g:deoplete#enable_at_startup = 1
-
-" Deoplete conflicts with LaTeX-to-Unicode completion
-" autocmd FileType julia
-"        \ call deoplete#custom#buffer_option('auto_complete', v:false)
-
 " source ~/dotfiles/vimrc/coc.vim
 source ~/dotfiles/vimrc/fzf.vim
 source ~/dotfiles/vimrc/julia.vim
@@ -107,21 +102,37 @@ source ~/dotfiles/vimrc/colorscheme.vim
 set t_ZH=[3m
 set t_ZR=[23m
 
-" ALE configuration
-" TOO DAMN SLOW!!!
-" let g:ale_completion_enabled = 0
-" let g:ale_sign_warning = '!'
-" let g:ale_sign_error = '!!'
-" " only run linters on save
-" let g:ale_lint_on_text_changed = 'never'
-" let g:ale_lint_on_insert_leave = 0
-" " set omnifunc=ale#completion#OmniFunc
-" " call deoplete#custom#option('sources', {
-" "   \ '_': ['ale'],
-" " \})
+" mucomplete configuration
+" let g:mucomplete#enable_auto_at_startup = 1
+" let g:mucomplete#completion_delay = 1
+" set completeopt+=menuone
+" set completeopt+=noselect
+" set shortmess+=c   " Shut off completion messages
+" set belloff+=ctrlg " If Vim beeps during completion
 
 " UltiSnips configuration
-let g:UltiSnipsExpandTrigger="<s-tab>"
-let g:UltiSnipsJumpForwardTrigger="<s-tab>"
-let g:UltiSniptsJumpBackwardTrigger="<c-tab>"
+let g:UltiSnipsExpandTrigger = "<tab>"        " Do not use <tab>
+let g:UltiSnipsJumpForwardTrigger = "<s-tab>"  " Do not use <c-j>
+" let g:UltiSnipsExpandTrigger="<tab>"
+" let g:UltiSnipsJumpForwardTrigger="<s-tab>"
+" let g:UltiSniptsJumpBackwardTrigger="<c-tab>"
 let g:UltiSnipsSnippetDirectories=["UltiSnips", "my-ultisnips"]
+
+" see MuComplete documentation on conflict with UltiSnips
+" let g:ulti_expand_or_jump_res = 0
+
+" fun! TryUltiSnips()
+"   if !pumvisible() " With the pop-up menu open, let Tab move down
+"     call UltiSnips#ExpandSnippetOrJump()
+"   endif
+"   return ''
+" endf
+
+" fun! TryMUcomplete()
+"   return g:ulti_expand_or_jump_res ? "" : "\<plug>(MUcompleteFwd)"
+" endf
+
+" inoremap <plug>(TryUlti) <c-r>=TryUltiSnips()<cr>
+" imap <expr> <silent> <plug>(TryMU) TryMUcomplete()
+" imap <expr> <silent> <tab> "\<plug>(TryUlti)\<plug>(TryMU)"
+
