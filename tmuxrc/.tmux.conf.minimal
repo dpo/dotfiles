@@ -1,0 +1,94 @@
+# set Home key as the prefix
+# a keyboard map is used to remap Caps-Lock to Home, so Caps-Lock acts as the prefix
+set -g prefix Home
+unbind C-b
+bind-key Home send-prefix
+
+# List of plugins
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-sensible'
+
+# tmux-resurrect and tmux-continuum to save the state across system restarts
+# prefix-Ctrl-s to save the state
+# prefix-Ctrl-r to restore the state
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @resurrect-strategy-vim 'session'
+set -g @resurrect-capture-pane-contents 'on'
+
+# tmux-continuum (automatically saves the state of the tmux session every 15 mins)
+# tmux-continuum extends tmux-resurrect
+set -g @plugin 'tmux-plugins/tmux-continuum'
+set -g @continuum-save-interval '600'  # save every 10 minutes
+set -g @continuum-restore 'on'
+
+# tmux-yank: Copy to the system clipboard in tmux
+# begin copying with Leader + ] V, end with ENTER
+set -g @plugin 'tmux-plugins/tmux-yank'
+
+# tmux-copycat: Regex search in tmux
+# prefix-/: regex search (string work too)
+# prefix-C-f: search for file name
+# prefix-C-u: search for URL (http, ftp and git URLs)
+# prefix-C-h: search for SHA1/SHA256
+# prefix-C-d: search for number (d is for digit)
+# prefix-M-i: search for IP address (M = alt)
+# copy search result with Enter, paste with prefix-]
+set -g @plugin 'tmux-plugins/tmux-copycat'
+
+# local customizations
+set -g mouse on
+set -g base-index 1        # number windows starting from 1 instead of 0
+setw -g pane-base-index 1  # number panes starting from 1 instead of 0
+
+# prefix-Shift-m to edit this file in a new pane
+bind-key M split-window -h "vim ~/.tmux.conf"
+
+# prefix-r to reload this config file
+bind-key r source-file ~/.tmux.conf \; display "Reloaded!"
+
+# more intuitive characters to split a window into panes
+bind-key | split-window -h -c '#{pane_current_path}'
+bind-key - split-window -v -c '#{pane_current_path}'
+bind-key _ split-window -f -c '#{pane_current_path}'  # opens a full-width pane
+
+# resize panes
+bind -n S-Left resize-pane -L 2
+bind -n S-Right resize-pane -R 2
+bind -n S-Up resize-pane -U 2
+bind -n S-Down resize-pane -D 2
+
+bind -n M-Left resize-pane -L 10
+bind -n M-Right resize-pane -R 10
+bind -n M-Up resize-pane -U 10
+bind -n M-Down resize-pane -D 10
+
+# use prefix-: select-layout to select other layouts
+bind-key = select-layout even-horizontal
+bind-key + select-layout even-vertical
+
+# break a pane and send to a new window
+bind b break-pane -d
+
+# use prefix-< and prefix-> to cycle through windows
+bind < previous-window
+bind > next-window
+
+# tmux-sensible sets status-keys to emacs; reset to vi
+setw -g mode-keys vi
+
+# copy-paste
+# prefix-esc to enter copy mode
+# space to begin visual selection
+# enter to copy selection
+# prefix-p to paste
+unbind [
+bind Escape copy-mode
+unbind p
+bind p paste-buffer
+unbind n
+
+# Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+if "test ! -d ~/.tmux/plugins/tpm" \
+     "run 'git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm && ~/.tmux/plugins/     tpm/bin/install_plugins'"
+run -b '~/.tmux/plugins/tpm/tpm'
+
